@@ -1,0 +1,59 @@
+{
+  "channel": "Graines de Savoir",
+  "voice": "ff_siwis",
+  "speed": 0.95,
+  "title_yt": "Cette graine a dormi 2 000 ans, puis elle a germé #shorts",
+  "description": "Le palmier dattier Mathusalem a poussé en 2005 à partir d'une graine d'environ 2 000 ans, trouvée à Massada (Israël).",
+  "sources": [
+    "https://www.nationalgeographic.com/science/article/150324-ancient-methuselah-date-palm-sprout-science"
+  ],
+  "scenes": [
+    {
+      "text": "Cette graine a dormi pendant deux mille ans.",
+      "caption": "Cette graine a dormi 2 000 ans",
+      "visual": "counter_years",
+      "bg": [[255, 224, 170], [236, 170, 96]],
+      "ticks": [0.25, 2.2, 0.065]
+    },
+    {
+      "text": "Des archéologues l'ont trouvée lors de fouilles à Massada, en Israël.",
+      "caption": "Trouvée à Massada, en Israël",
+      "visual": "masada",
+      "bg": [[255, 214, 150], [244, 150, 90]]
+    },
+    {
+      "text": "Elle est ensuite restée oubliée dans un tiroir pendant des années.",
+      "caption": "Oubliée dans un tiroir",
+      "visual": "drawer",
+      "bg": [[214, 196, 170], [150, 120, 90]],
+      "sfx": [[0.6, "creak", 0.5]]
+    },
+    {
+      "text": "En deux mille cinq, la chercheuse Elaine Solowey l'a plantée. Et elle a germé !",
+      "caption": "2005 : elle germe !",
+      "visual": "sprout",
+      "bg": [[190, 230, 255], [120, 190, 120]],
+      "sfx": [[-1.0, "ding", 0.7], [-0.95, "pop", 0.6]]
+    },
+    {
+      "text": "Ce palmier dattier, surnommé Mathusalem, mesurait déjà plus de trois mètres en deux mille quinze.",
+      "caption": "Mathusalem : plus de 3 m en 2015",
+      "visual": "palm",
+      "bg": [[186, 226, 252], [250, 226, 170]]
+    },
+    {
+      "text": "Il a même fécondé un palmier femelle, qui a ensuite produit des dattes.",
+      "caption": "Il a donné des dattes !",
+      "visual": "dates",
+      "bg": [[186, 226, 252], [250, 226, 170]],
+      "sfx": [[-1.2, "pop", 0.6], [-0.9, "pop", 0.6], [-0.6, "pop", 0.6]]
+    },
+    {
+      "text": "Abonne-toi pour découvrir les secrets des graines.",
+      "caption": "Abonne-toi !",
+      "visual": "cta",
+      "bg": [[255, 224, 170], [236, 170, 96]],
+      "sfx": [[0.5, "clap", 0.7], [0.75, "clap", 0.6]]
+    }
+  ]
+}

@@ -91,7 +91,32 @@ def birds():
     return np.concatenate(parts) * 0.5
 
 
-SOUNDS = {"pop": pop, "ding": ding, "thud": thud, "step": step, "growl": growl, "sad_boing": sad_boing,
+def whoosh():
+    t = _t(0.35)
+    n = _rng.standard_normal(len(t))
+    k = np.linspace(4, 60, len(t)).astype(int)
+    out = np.array([n[max(0, i - k[i]):i + 1].mean() for i in range(len(t))])
+    return out * np.sin(np.pi * t / 0.35) * 5 * 0.6
+
+
+def tick():
+    t = _t(0.03)
+    return np.sin(2 * np.pi * 1800 * t) * _env(len(t), decay=120) * 0.6
+
+
+def clap():
+    t = _t(0.18)
+    n = _rng.standard_normal(len(t))
+    n = n - _lp(n, 6)
+    return n * _env(len(t), attack=0.001, decay=28) * 1.6
+
+
+def sparkle_sfx():
+    parts = [_sweep(f, f * 1.5, 0.12, decay=14) for f in (1200, 1500, 1900)]
+    return np.concatenate(parts) * 0.5
+
+
+SOUNDS = {"whoosh": whoosh, "tick": tick, "clap": clap, "sparkle": sparkle_sfx, "pop": pop, "ding": ding, "thud": thud, "step": step, "growl": growl, "sad_boing": sad_boing,
           "oops": oops, "creak": creak, "crunch": crunch, "birds": birds}
 
 

@@ -1,2 +1,4 @@
 pillow
 numpy
+kokoro-onnx
+soundfile
