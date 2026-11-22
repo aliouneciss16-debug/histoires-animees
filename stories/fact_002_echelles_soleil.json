@@ -1,0 +1,54 @@
+{
+  "channel": "Le Saviez-Vous ?",
+  "voice": "ff_siwis",
+  "speed": 0.95,
+  "title_yt": "La Terre paraît énorme... jusqu'à ce que tu vois ça #shorts",
+  "description": "Comparaison d'échelle : Terre, Jupiter, Soleil. Jupiter est environ 11 fois plus large que la Terre, le Soleil environ 109 fois, et son volume vaut environ 1,3 million de Terres.",
+  "sources": [
+    "https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html",
+    "https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html"
+  ],
+  "scenes": [
+    {
+      "text": "Tu penses que la Terre est grande ? Regarde.",
+      "caption": "Tu trouves la Terre grande ?",
+      "visual": "s_earth",
+      "bg": [[6, 10, 36], [22, 12, 54]]
+    },
+    {
+      "text": "À côté de Jupiter, la Terre paraît minuscule. Jupiter est onze fois plus large.",
+      "caption": "Jupiter : 11 fois plus large",
+      "visual": "s_jupiter",
+      "bg": [[6, 10, 36], [22, 12, 54]],
+      "sfx": [[0.35, "whoosh", 0.6]]
+    },
+    {
+      "text": "Et le Soleil ? Il est cent neuf fois plus large que la Terre.",
+      "caption": "Le Soleil : 109 fois plus large",
+      "visual": "s_sun",
+      "bg": [[6, 10, 36], [22, 12, 54]],
+      "sfx": [[0.3, "whoosh", 0.6], [-0.7, "ding", 0.5]]
+    },
+    {
+      "text": "On pourrait faire entrer plus d'un million de Terres dans le Soleil.",
+      "caption": "1 304 000 Terres dans le Soleil",
+      "visual": "s_fill",
+      "bg": [[6, 10, 36], [22, 12, 54]],
+      "ticks": [0.3, 3.0, 0.05]
+    },
+    {
+      "text": "Et pourtant, le Soleil est une étoile ordinaire. Certaines étoiles sont des centaines de fois plus larges.",
+      "caption": "Des étoiles bien plus géantes",
+      "visual": "s_giant",
+      "bg": [[6, 10, 36], [22, 12, 54]],
+      "sfx": [[0.4, "whoosh", 0.7], [-0.8, "thud", 0.7]]
+    },
+    {
+      "text": "Abonne-toi : demain, encore plus grand.",
+      "caption": "Abonne-toi !",
+      "visual": "cta2",
+      "bg": [[6, 10, 36], [22, 12, 54]],
+      "sfx": [[0.5, "clap", 0.7], [0.75, "clap", 0.6]]
+    }
+  ]
+}

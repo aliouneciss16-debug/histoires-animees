@@ -97,6 +97,54 @@ def _drawer_front():
     return c.done()
 
 
+
+def _clip_circle(layer_cv, margin, size):
+    from PIL import ImageChops
+    mask = Image.new("L", (size * S, size * S), 0)
+    ImageDraw.Draw(mask).ellipse([margin * S, margin * S, (size - margin) * S, (size - margin) * S], fill=255)
+    layer_cv.im.putalpha(ImageChops.multiply(layer_cv.im.getchannel("A"), mask))
+
+
+def _earth():
+    c = Cv(600, 600)
+    c.ell(300, 300, 290, 290, (36, 98, 186, 255))
+    land = Cv(600, 600)
+    for x, y, rx, ry in [(220, 210, 110, 80), (400, 250, 70, 110), (280, 400, 120, 60), (440, 440, 60, 50), (150, 340, 50, 70), (330, 120, 70, 40)]:
+        land.ell(x, y, rx, ry, (66, 164, 86, 255))
+    for x, y, rx, ry in [(180, 150, 120, 16), (380, 330, 140, 14), (240, 470, 110, 14), (420, 150, 90, 12)]:
+        land.ell(x, y, rx, ry, (255, 255, 255, 170))
+    _clip_circle(land, 10, 600)
+    c.im.alpha_composite(land.im)
+    shade = Cv(600, 600)
+    shade.ell(380, 330, 330, 330, (0, 0, 20, 0))
+    c.arc((12, 12, 588, 588), 200, 340, (150, 200, 255, 255), 10)
+    return c.done()
+
+
+def _jupiter():
+    c = Cv(600, 600)
+    c.ell(300, 300, 290, 290, (214, 170, 120, 255))
+    bands = Cv(600, 600)
+    for y0, y1, col in [(40, 110, (190, 140, 96, 255)), (110, 170, (232, 206, 170, 255)), (170, 250, (176, 112, 70, 255)),
+                        (250, 300, (240, 220, 190, 255)), (300, 370, (186, 128, 84, 255)), (370, 430, (232, 206, 170, 255)),
+                        (430, 500, (170, 116, 76, 255)), (500, 560, (210, 168, 120, 255))]:
+        bands.rrect((0, y0, 600, y1), 6, col)
+    bands.ell(400, 370, 52, 30, (190, 70, 50, 255))
+    _clip_circle(bands, 10, 600)
+    c.im.alpha_composite(bands.im)
+    return c.done()
+
+
+def _radial(inner, outer, glow, size=1200, radius=500):
+    yy, xx = np.mgrid[0:size, 0:size]
+    r = np.hypot(xx - size / 2, yy - size / 2)
+    k = np.clip(r / radius, 0, 1)[..., None]
+    rgb = np.array(inner) * (1 - k) + np.array(outer) * k
+    a = np.where(r <= radius, 255.0, np.clip(1 - (r - radius) / (size / 2 - radius), 0, 1) ** 2 * glow)
+    arr = np.dstack([rgb, a]).astype(np.uint8)
+    return Image.fromarray(arr, "RGBA")
+
+
 def pill(text, fill=(255, 255, 255, 235), color=(40, 40, 60), size=46):
     fnt = font(True, size)
     d0 = ImageDraw.Draw(Image.new("RGB", (4, 4)))
@@ -113,6 +161,12 @@ class Assets:
         self.seed, self.frond, self.dates, self.pot = _seed(), _frond(), _dates(), _pot()
         self.mesa, self.cabinet, self.front = _mesa(), _cabinet(), _drawer_front()
         self.hill = _hill((92, 168, 84, 255))
+        self.earth, self.jupiter = _earth(), _jupiter()
+        self.sun = _radial((255, 250, 190), (255, 150, 40), 140)
+        self.giant = _radial((255, 190, 120), (200, 50, 30), 120)
+        self.channel = ""
+        rnd = __import__("random").Random(11)
+        self.stars = [(rnd.randint(0, W), rnd.randint(0, H), rnd.choice([1, 1, 2, 2, 3]), rnd.random() * 6) for _ in range(150)]
         self.sparkle = sparkle()
         self.bgs = {}
         self.pills = {}
@@ -293,14 +347,102 @@ def vis_cta(f, A, t, dur):
     bounce = abs(math.sin(t * 4)) * 24
     place_c(f, A.seed, 540, 560 - bounce, 1.6, rot=-18)
     d = ImageDraw.Draw(f)
-    d.text((540, 860), "Graines de Savoir", font=font(True, 96), fill=(110, 56, 16), anchor="mm")
+    d.text((540, 860), A.channel, font=font(True, 96), fill=(110, 56, 16), anchor="mm")
     for k in range(5):
         a = t * 3 + k * 1.25
         place_c(f, A.sparkle, 540 + 360 * math.cos(a), 640 + 230 * math.sin(a), 0.5, rot=a * 70)
 
 
+def starfield(f, A, t):
+    d = ImageDraw.Draw(f)
+    for x, y, r, ph in A.stars:
+        v = int(150 + 105 * abs(math.sin(t * 1.3 + ph)))
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(v, v, min(255, v + 20)))
+
+
+def body(f, spr, base, cx, cy, diameter):
+    place_c(f, spr, cx, cy, diameter / base)
+
+
+def vis_s_earth(f, A, t, dur):
+    starfield(f, A, t)
+    k = 1 + 0.02 * math.sin(t * 3)
+    body(f, A.earth, 580, 540, 560, 520 * k)
+    lab = A.label("La Terre", size=52)
+    f.paste(lab, ((W - lab.width) // 2, 880), lab)
+    ImageDraw.Draw(f).text((540, 1030), "12 756 km", font=font(True, 96), fill=(255, 255, 255), anchor="mm")
+
+
+def vis_s_jupiter(f, A, t, dur):
+    starfield(f, A, t)
+    jx = lerp(1500, 700, ease(seg(t, 0.3, 1.3)))
+    body(f, A.jupiter, 580, jx, 600, 60 * 11.209)
+    body(f, A.earth, 580, 200, 700, 60)
+    lab = A.label("Terre", size=42)
+    f.paste(lab, (200 - lab.width // 2, 750), lab)
+    if t > 1.2:
+        lab = A.label("Jupiter ×11", size=46)
+        f.paste(lab, (700 - lab.width // 2, 960), lab)
+
+
+def vis_s_sun(f, A, t, dur):
+    starfield(f, A, t)
+    e = ease(seg(t, 0.25, 2.6))
+    sun_d = lerp(260, 800, e)
+    sun_y = lerp(-120, 540, e)
+    body(f, A.sun, 1000, 540, sun_y, sun_d)
+    jd, ed = lerp(672, 82, e), lerp(60, 7.3, e)
+    jx, jy = lerp(700, 300, e), lerp(600, 1020, e)
+    ex, ey = lerp(200, 470, e), lerp(700, 1020, e)
+    body(f, A.jupiter, 580, jx, jy, jd)
+    body(f, A.earth, 580, ex, ey, ed)
+    if e > 0.85:
+        d = ImageDraw.Draw(f)
+        d.ellipse([ex - 22, ey - 22, ex + 22, ey + 22], outline=(255, 255, 255), width=3)
+        for x, txt in ((jx, "Jupiter"), (ex + 70, "Terre")):
+            lab = A.label(txt, size=34)
+            f.paste(lab, (int(x - lab.width // 2), 1065), lab)
+        lab = A.label("Soleil ×109", size=54)
+        f.paste(lab, ((W - lab.width) // 2, 500), lab)
+
+
+def vis_s_fill(f, A, t, dur):
+    starfield(f, A, t)
+    body(f, A.sun, 1000, 540, 560, 800)
+    n = int(700 * ease(seg(t, 0.3, 3.0)))
+    d = ImageDraw.Draw(f)
+    for i in range(n):
+        r = 380 * math.sqrt((i + 0.5) / 700)
+        a = i * 2.39996
+        x, y = 540 + r * math.cos(a), 560 + r * math.sin(a)
+        d.ellipse([x - 7, y - 7, x + 7, y + 7], fill=(70, 140, 255), outline=(220, 240, 255))
+    cnt = int(1304000 * ease(seg(t, 0.3, 3.0)))
+    d.text((540, 1040), f"{cnt:,}".replace(",", " ") + " Terres", font=font(True, 76), fill=(255, 255, 255), anchor="mm")
+
+
+def vis_s_giant(f, A, t, dur):
+    starfield(f, A, t)
+    gx = lerp(2400, 1500, ease(seg(t, 0.3, 1.6)))
+    body(f, A.giant, 1000, gx, 1000, 2000)
+    body(f, A.sun, 1000, 280, 640, 110)
+    lab = A.label("Soleil", size=40)
+    f.paste(lab, (280 - lab.width // 2, 720), lab)
+    if t > 1.4:
+        lab = A.label("Étoile géante", size=50)
+        f.paste(lab, (760 - lab.width // 2, 560), lab)
+
+
+def vis_cta2(f, A, t, dur):
+    starfield(f, A, t)
+    bounce = abs(math.sin(t * 4)) * 24
+    body(f, A.earth, 580, 540, 560 - bounce, 420)
+    ImageDraw.Draw(f).text((540, 860), A.channel, font=font(True, 92), fill=(255, 255, 255), anchor="mm")
+
+
 VIS = {"counter_years": vis_counter_years, "masada": vis_masada, "drawer": vis_drawer,
-       "sprout": vis_sprout, "palm": vis_palm, "dates": vis_dates, "cta": vis_cta}
+       "sprout": vis_sprout, "palm": vis_palm, "dates": vis_dates, "cta": vis_cta,
+       "s_earth": vis_s_earth, "s_jupiter": vis_s_jupiter, "s_sun": vis_s_sun, "s_fill": vis_s_fill,
+       "s_giant": vis_s_giant, "cta2": vis_cta2}
 
 
 # ---------- légende ----------
@@ -331,6 +473,7 @@ def assets():
 def frame(story, idx, t, dur):
     A = assets()
     sc = story["scenes"][idx]
+    A.channel = story["channel"]
     f = A.bg(sc["bg"]).copy()
     VIS[sc["visual"]](f, A, t, dur)
     tag = tag_overlay(story["channel"])
