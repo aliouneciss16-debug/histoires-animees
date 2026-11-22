@@ -1,0 +1,43 @@
+{
+  "title_fr": "La pomme partagée",
+  "title_en": "The Shared Apple",
+  "channel": "Petites Fables",
+  "word_of_the_day": {"en": "apple", "fr": "pomme"},
+  "scenes": [
+    {
+      "fr": "Roux a trouvé un pommier.",
+      "en": "Roux found an apple tree.",
+      "sfx": [[0.4, "birds", 0.45], [3.6, "birds", 0.3], [4.3, "ding", 0.35]],
+      "steps": [[0.2, 2.6, 0.34]]
+    },
+    {
+      "fr": "Roux garde toutes les pommes.",
+      "en": "Roux keeps all the apples.",
+      "sfx": [[0.75, "pop", 0.8], [1.2, "pop", 0.8], [1.65, "pop", 0.8], [2.1, "pop", 0.8], [2.55, "pop", 0.8], [3.0, "pop", 0.8], [3.45, "pop", 0.8], [3.9, "pop", 0.8], [4.6, "growl", 0.6]],
+      "steps": [[1.3, 2.7, 0.34]]
+    },
+    {
+      "fr": "Pico a faim. Roux dit non.",
+      "en": "Pico is hungry. Roux says no.",
+      "sfx": [[0.2, "growl", 0.6], [1.5, "pop", 0.6], [3.0, "thud", 0.7], [3.5, "sad_boing", 0.6]],
+      "steps": [[0.5, 1.5, 0.34]]
+    },
+    {
+      "fr": "Le panier est trop lourd !",
+      "en": "The basket is too heavy!",
+      "sfx": [[0.7, "creak", 0.5], [1.8, "creak", 0.5], [2.9, "creak", 0.55], [3.6, "oops", 0.7], [3.7, "thud", 0.8], [4.1, "pop", 0.5], [4.45, "pop", 0.5]]
+    },
+    {
+      "fr": "Pico l'aide, malgré tout.",
+      "en": "Pico helps him anyway.",
+      "sfx": [[1.8, "pop", 0.5], [3.5, "pop", 0.5], [4.1, "ding", 0.55]],
+      "steps": [[0.3, 3.2, 0.34]]
+    },
+    {
+      "fr": "Partager rend tout plus doux.",
+      "en": "Sharing makes everything sweeter.",
+      "moral": true,
+      "sfx": [[0.3, "birds", 0.4], [1.0, "pop", 0.7], [1.3, "pop", 0.7], [1.6, "pop", 0.7], [1.9, "pop", 0.7], [3.1, "crunch", 0.8], [3.8, "crunch", 0.8], [4.5, "crunch", 0.8], [5.1, "ding", 0.5]]
+    }
+  ]
+}
