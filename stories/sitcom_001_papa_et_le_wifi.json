@@ -1,0 +1,41 @@
+{
+  "channel": "La Famille Sarr",
+  "title_yt": "Papa et le wifi : qui a débranché la boîte ? #shorts",
+  "description": "Épisode 1 de La Famille Sarr : le wifi tombe en panne, et les enfants cachent un petit secret.",
+  "voices": {
+    "papa":   {"voice": "ff_siwis", "speed": 0.9,  "pitch": 0.80},
+    "maman":  {"voice": "ff_siwis", "speed": 0.95, "pitch": 1.00},
+    "moussa": {"voice": "ff_siwis", "speed": 1.02, "pitch": 1.13},
+    "awa":    {"voice": "ff_siwis", "speed": 1.05, "pitch": 1.30}
+  },
+  "lines": [
+    {"who": "papa", "emotion": "angry", "wifi": false,
+     "text": "Mais enfin ! Le wifi ne marche plus ! Je n'arrive même pas à regarder mon match."},
+    {"who": "maman", "emotion": "neutral", "wifi": false,
+     "text": "Samba, ça fait une heure que tu es sur ton téléphone."},
+    {"who": "papa", "emotion": "smug", "wifi": false,
+     "text": "Je ne suis pas sur mon téléphone. Je suis en réunion. Avec le monde entier."},
+    {"who": "moussa", "emotion": "smug", "wifi": false, "react": {"awa": "happy"},
+     "text": "Chut ! Il n'a toujours pas compris que c'est nous."},
+    {"who": "awa", "emotion": "surprised", "wifi": false,
+     "text": "Pourquoi on a débranché la boîte, déjà ?"},
+    {"who": "moussa", "emotion": "neutral", "wifi": false,
+     "text": "Pour que Papa joue avec nous. Il nous a promis une partie depuis dimanche."},
+    {"who": "papa", "emotion": "surprised", "wifi": false,
+     "text": "Vous avez entendu quelque chose ? Un petit bruit de plastique ?"},
+    {"who": "awa", "emotion": "happy", "wifi": false, "react": {"moussa": "surprised"},
+     "text": "Non, Papa. Aucun bruit de plastique. La boîte est juste fatiguée."},
+    {"who": "maman", "emotion": "smug", "wifi": false,
+     "text": "Moussa. Awa. Rendez la boîte à votre père."},
+    {"who": "moussa", "emotion": "happy", "wifi": true, "sfx": [[0.0, "ding", 0.7]],
+     "text": "D'accord ! Mais Papa joue avec nous. Une partie. Une seule."},
+    {"who": "papa", "emotion": "sad", "wifi": true,
+     "text": "Bon. Une partie. Mais c'est moi qui choisis le jeu."},
+    {"who": "awa", "emotion": "happy", "wifi": true,
+     "text": "Super ! On joue aux cartes. Et Papa, tu vas perdre !"},
+    {"who": "papa", "emotion": "smug", "wifi": true,
+     "text": "Perdre ? Moi ? Je n'ai jamais perdu."},
+    {"who": "maman", "emotion": "smug", "wifi": true, "sfx": [[0.9, "clap", 0.7]],
+     "text": "Il perd tout le temps."}
+  ]
+}
