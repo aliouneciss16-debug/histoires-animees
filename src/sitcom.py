@@ -40,6 +40,8 @@ SPEC = {
     "awa": dict(skin=(154, 102, 68), hair=(28, 20, 18), outfit=(152, 92, 204), ribbon=(250, 214, 60), kind="puffs",
                 scale=0.6, x=680, color=(170, 110, 220), label="Awa"),
 }
+SPEC["mame"] = dict(skin=(112, 72, 48), hair=(235, 235, 235), outfit=(30, 140, 130), trim=(244, 214, 120), kind="wrap",
+                    wrap=(70, 120, 200), scale=0.8, x=960, color=(70, 120, 200), label="Mame")
 ORDER = ["papa", "maman", "moussa", "awa"]
 MOUTH_BY_EMOTION = {"neutral": "smile", "angry": "frown", "smug": "smirk", "sad": "frown", "surprised": "o", "happy": "smile"}
 
@@ -263,9 +265,9 @@ def assets():
 
 
 # ---------- dessin d'une image ----------
-def draw_char(f, A, name, expr, look, mouth, t, speaking, amp):
+def draw_char(f, A, name, expr, look, mouth, t, speaking, amp, dx=0, dy=0):
     sp, ch = SPEC[name], A.chars[name]
-    phase = {"papa": 0.0, "maman": 0.9, "moussa": 1.7, "awa": 2.4}[name]
+    phase = {"papa": 0.0, "maman": 0.9, "moussa": 1.7, "awa": 2.4, "mame": 3.1}[name]
     blink = ((t + phase * 1.3) % 3.4) < 0.12
     comp = Image.new("RGBA", (460, 650), (0, 0, 0, 0))
     comp.alpha_composite(ch["body"], (0, 330))
@@ -278,7 +280,7 @@ def draw_char(f, A, name, expr, look, mouth, t, speaking, amp):
     comp.alpha_composite(head, (80, 20 + bob))
     s = sp["scale"] * (1.035 if speaking else 1.0) * (1 + 0.012 * math.sin(t * 2.2 + phase))
     comp = comp.resize((int(460 * s), int(650 * s)), Image.BILINEAR)
-    f.paste(comp, (int(sp["x"] - comp.width / 2), int(Y_B - comp.height)), comp)
+    f.paste(comp, (int(sp["x"] + dx - comp.width / 2), int(Y_B - comp.height + dy)), comp)
 
 
 def mouth_for(env, emotion):
