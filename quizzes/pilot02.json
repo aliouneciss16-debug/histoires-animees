@@ -1,0 +1,6 @@
+{"brand":"QUICK QUIZ","hook":["FIND THE ODD ONE","You have 5 seconds!"],"hook_emoji":"🔍",
+"rounds":[
+{"kind":"grid","q":"Find the odd emoji!","rows":5,"cols":5,"base":"🙂","odd":"🙃","pos":[3,1],"answer_text":"Upside-down face"},
+{"kind":"odd","q":"Which one is the odd one out?","items":[["🍎","Apple"],["🍌","Banana"],["🥕","Carrot"],["🍇","Grapes"]],"answer":2,"answer_text":"Carrot (a vegetable)"},
+{"kind":"odd","q":"Which one is the odd one out?","items":[["🐶","Dog"],["🐱","Cat"],["🦅","Eagle"],["🐰","Rabbit"]],"answer":2,"answer_text":"Eagle (a bird)"}],
+"scores":[["3/3  Sharp eyes","🦅"],["2/3  Nice try","👀"],["0-1  Try again!","🔁"]]}

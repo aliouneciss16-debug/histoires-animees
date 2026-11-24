@@ -1,0 +1,6 @@
+{"brand":"QUICK QUIZ","hook":["3 MOVIES","Guess them by emoji!"],"hook_emoji":"🎬",
+"rounds":[
+{"kind":"emoji","q":"Which movie is this?","emoji":["🦁","👑"],"items":["The Lion King","Madagascar","Jumanji","Zootopia"],"answer":0,"answer_text":"The Lion King"},
+{"kind":"emoji","q":"Which movie is this?","emoji":["🚢","🧊","💔"],"items":["Moana","Titanic","Jaws","Aquaman"],"answer":1,"answer_text":"Titanic"},
+{"kind":"emoji","q":"Which movie is this?","emoji":["🕷️","🕸️","🧑"],"items":["Ant-Man","Batman","Spider-Man","Black Panther"],"answer":2,"answer_text":"Spider-Man"}],
+"scores":[["3/3  Movie genius","🏆"],["2/3  Great job","🎬"],["0-1  Watch more movies!","🍿"]]}
