@@ -2,3 +2,4 @@ out/
 models/
 __pycache__/
 *.pyc
+*_frames/

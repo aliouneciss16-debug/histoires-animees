@@ -11,9 +11,9 @@ import sfx
 from render import font, wrap
 
 W, H, FPS = 1080, 1920, 30
-HOOK, THINK, REVEAL, INTRO = 2.2, 5.0, 2.2, 0.7
+HOOK, THINK, REVEAL, INTRO = 2.4, 5.0, 2.4, 1.5
 RDUR = INTRO + THINK + REVEAL
-OUTRO = 3.2
+OUTRO = 3.7
 BG1, BG2 = (38, 22, 92), (14, 10, 46)
 YEL, CYA, GRN, RED, WHT = (255, 214, 64), (80, 220, 255), (70, 220, 120), (255, 90, 100), (255, 255, 255)
 EMOJI_TTF = "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf"
@@ -189,6 +189,28 @@ def frame(spec, t):
     return img
 
 
+_k = None
+
+
+def tts(text, voice="af_bella", speed=1.08):
+    import hashlib
+    global _k
+    cd = Path("out/quiz_voice"); cd.mkdir(parents=True, exist_ok=True)
+    f = cd / (hashlib.sha1(f"{voice}|{speed}|{text}".encode()).hexdigest()[:16] + ".npy")
+    if f.exists(): return np.load(f)
+    if _k is None:
+        from kokoro_onnx import Kokoro
+        _k = Kokoro("/home/claude/models/kokoro-v1.0.int8.onnx", "/home/claude/models/voices-v1.0.bin")
+    a, sr = _k.create(text, voice=voice, speed=speed, lang="en-us")
+    a = a.astype(np.float32); np.save(f, a); return a
+
+
+def say(buf, t0, text):
+    a = tts(text)
+    v = np.interp(np.arange(int(len(a) * sfx.SR / 24000)) * 24000 / sfx.SR, np.arange(len(a)), a)
+    i = int(t0 * sfx.SR); buf[i:i + len(v)] += v[: len(buf) - i] * 1.6
+
+
 def audio(spec, out):
     hk, n, total = timeline(spec)
     ev = [(0.1, "pop", 0.9)]
@@ -200,7 +222,13 @@ def audio(spec, out):
         ev.append((t0 + INTRO + THINK, "ding", 0.9))
         ev.append((t0 + INTRO + THINK + 0.05, "sparkle", 0.6))
     ev.append((hk + n * RDUR, "whoosh", 0.6)); ev.append((hk + n * RDUR + 0.3, "clap", 0.6))
-    a = sfx.mix(ev, total)[: int(total * sfx.SR)]
+    a = sfx.mix(ev, total)[: int(total * sfx.SR)] * 0.5
+    say(a, 0.15, spec["hook"][0].title() + "! " + spec["hook"][1])
+    for ri, r in enumerate(spec["rounds"]):
+        t0 = hk + ri * RDUR
+        say(a, t0 + 0.1, r["q"])
+        say(a, t0 + INTRO + THINK + 0.35, "It's " + r["answer_text"].split(" (")[0] + "!")
+    say(a, hk + n * RDUR + 0.3, "How many did you get? Comment your score, and follow for more!")
     a = a / max(1e-6, np.abs(a).max()) * 0.9
     sfx.write_wav(out, a.astype(np.float32))
 
