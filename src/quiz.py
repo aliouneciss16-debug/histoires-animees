@@ -104,7 +104,7 @@ def draw_round(img, d, r, t):
         n = len(em); size = 230 if n <= 3 else 190
         for i, ch in enumerate(em):
             s = back((t - 0.1 - i * 0.12) * 3)
-            put(img, ch, 540 + (i - (n - 1) / 2) * (size + 30), 560, size * clamp(s, 0.01, 1.15))
+            put(img, ch, 540 + (i - (n - 1) / 2) * (size + 30), r.get('ey', 560), size * clamp(s, 0.01, 1.15))
         cw, chh = 450, 170
         for i, opt in enumerate(r["items"]):
             x0 = 60 + (i % 2) * (cw + 60); y0 = 800 + (i // 2) * (chh + 40)
