@@ -181,7 +181,9 @@ CTAS = [('💬', 'Comment your answer: A, B, C or D'), ('🤝', 'Share with a sm
 
 
 def cfg(spec):
-    global INTRO, RDUR
+    global INTRO, RDUR, HOOK, OUTRO, THINK, REVEAL
+    HOOK = spec.get('hook_len', 2.7); OUTRO = spec.get('outro_len', 6.8)
+    THINK = spec.get('think', 5.0); REVEAL = spec.get('reveal', 2.0)
     INTRO = spec.get('intro', 2.2); RDUR = INTRO + THINK + REVEAL
 
 
@@ -217,6 +219,16 @@ def frame(spec, t):
     else:
         u = t - hk - n * RDUR
         header(img, d, n, n, brand)
+        if spec.get("micro"):
+            text(d, (540, 520), "Your answer?", int(120 * clamp(back(u * 2.5), 0.2, 1.1)), YEL, stroke=4)
+            for i, (e, lab, col) in enumerate([("💬", "COMMENT A, B, C or D", (80, 200, 120)), ("🔔", "SUBSCRIBE for more", (255, 60, 80))]):
+                a = clamp(back((u - 0.3 - i * 0.4) * 3), 0.0, 1.1)
+                if a <= 0.02: continue
+                cy = 900 + i * 330; w2, h2 = 440 * a, 130 * a
+                pill(d, (540 - w2, cy - h2, 540 + w2, cy + h2), col, 60)
+                if a > 0.7:
+                    put(img, e, 220, cy, 100); text(d, (640, cy), lab, 46, WHT, stroke=2)
+            return img
         text(d, (540, 330), "Your score?", int(110 * clamp(back(u * 2.5), 0.2, 1.1)), YEL, stroke=4)
         for i, (lab, e) in enumerate(spec["scores"]):
             y = 500 + i * 135
@@ -278,13 +290,13 @@ def audio(spec, out):
     ev.append((hk + n * RDUR, "whoosh", 0.6)); ev.append((hk + n * RDUR + 0.3, "clap", 0.6))
     for i in range(4): ev.append((hk + n * RDUR + 1.0 + i * 0.55, "pop", 0.7))
     a = sfx.mix(ev, total)[: int(total * sfx.SR)] * 0.5
-    say(a, 0.15, spec["hook"][0].title() + "! " + spec["hook"][1])
+    if hk > 0: say(a, 0.15, spec["hook"][0].title() + "! " + spec["hook"][1])
     for ri, r in enumerate(spec["rounds"]):
         t0 = hk + ri * RDUR
         say(a, t0 + 0.1, LEAD.get(r.get("level"), "") + " " + r["q"])
         ans = r["answer_text"].split(" (")[0]
         say(a, t0 + INTRO + THINK + 0.3, ("The answer is " + ans + "!") if ans.replace(".", "").isdigit() else ("It's " + ans + "!"))
-    say(a, hk + n * RDUR + 0.3, "Like if you got three out of three! Comment your score, share it with a friend, and subscribe for a new quiz every day!")
+    say(a, hk + n * RDUR + 0.3, spec.get("outro_say", "Like if you got three out of three! Comment your score, share it with a friend, and subscribe for a new quiz every day!"))
     a = a / max(1e-6, np.abs(a).max()) * 0.9
     sfx.write_wav(out, a.astype(np.float32))
 
