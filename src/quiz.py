@@ -11,9 +11,9 @@ import sfx
 from render import font, wrap
 
 W, H, FPS = 1080, 1920, 30
-HOOK, THINK, REVEAL, INTRO = 2.4, 5.0, 2.4, 1.5
+HOOK, THINK, REVEAL, INTRO = 2.7, 5.0, 2.0, 2.2
 RDUR = INTRO + THINK + REVEAL
-OUTRO = 3.7
+OUTRO = 6.8
 BG1, BG2 = (38, 22, 92), (14, 10, 46)
 YEL, CYA, GRN, RED, WHT = (255, 214, 64), (80, 220, 255), (70, 220, 120), (255, 90, 100), (255, 255, 255)
 EMOJI_TTF = "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf"
@@ -64,9 +64,15 @@ def pill(d, box, fill, r=40, outline=None, w=0):
     d.rounded_rectangle(box, radius=r, fill=fill, outline=outline, width=w)
 
 
-def header(img, d, ri, nr, brand):
+LV = {'EASY': (70, 200, 110), 'MEDIUM': (255, 160, 40), 'HARD': (255, 70, 90)}
+
+
+def header(img, d, ri, nr, brand, level=None):
     pill(d, (40, 60, 40 + 400, 140), YEL, 40)
     text(d, (240, 100), brand, 40, (50, 25, 80))
+    if level:
+        pill(d, (470, 70, 470 + 250, 130), LV[level], 30)
+        text(d, (595, 100), level, 38, WHT, stroke=2)
     if ri is not None:
         for i in range(nr):
             x = 1040 - (nr - i) * 70 + 35
@@ -79,6 +85,22 @@ def question(d, q, t):
     s = back(t * 3)
     for k, ln in enumerate(lines):
         text(d, (540, 250 + k * 96), ln, int(78 * clamp(s, 0.2, 1.1)), WHT, stroke=3)
+
+
+def tokens(img, d, row, cy, t, size=96):
+    f = font(True, int(size * 0.95))
+    ws = [d.textlength(tk, font=f) if tk.isascii() else size for tk in row]
+    gap = size * 0.28
+    total = sum(ws) + gap * (len(row) - 1)
+    x = 540 - total / 2
+    for i, tk in enumerate(row):
+        cx = x + ws[i] / 2; x += ws[i] + gap
+        a = clamp((t - 0.1 - i * 0.07) * 4)
+        if a <= 0: continue
+        if tk.isascii():
+            text(d, (cx, cy), tk, int(size * 0.95 * a + 1), YEL if (tk in "+=?" or not tk.isdigit()) else WHT, stroke=3)
+        else:
+            put(img, tk, cx, cy, size * a)
 
 
 def timer(d, t):
@@ -100,14 +122,15 @@ def draw_round(img, d, r, t):
     rev = clamp((tt - THINK) / 0.5) if tt > THINK else 0
     question(d, r["q"], clamp(t / 0.5))
     if k == "emoji":  # rangée d'emojis + 4 choix
-        em = r["emoji"]
-        n = len(em); size = 230 if n <= 3 else 190
+        em = [] if "lines" in r else r["emoji"]
+        for li, row in enumerate(r.get("lines", [])): tokens(img, d, row, r.get("ly", 470) + li * r.get("lstep", 125), t, r.get("tsize", 96))
+        n = len(em); size = r.get('esz', 230 if n <= 3 else 190)
         for i, ch in enumerate(em):
             s = back((t - 0.1 - i * 0.12) * 3)
             put(img, ch, 540 + (i - (n - 1) / 2) * (size + 30), r.get('ey', 560), size * clamp(s, 0.01, 1.15))
         cw, chh = 450, 170
         for i, opt in enumerate(r["items"]):
-            x0 = 60 + (i % 2) * (cw + 60); y0 = 800 + (i // 2) * (chh + 40)
+            x0 = 60 + (i % 2) * (cw + 60); y0 = r.get('oy', 800) + (i // 2) * (chh + 40)
             a = back((t - 0.5 - i * 0.1) * 3)
             ok = i == r["answer"]
             fill = (GRN if ok else (90, 80, 150)) if rev and ok else ((60, 50, 120) if not rev or ok else (45, 38, 90))
@@ -120,17 +143,17 @@ def draw_round(img, d, r, t):
                 text(d, (x0 + 125, cy), opt, 44 if len(opt) < 12 else 38, WHT, anchor="lm")
     elif k == "grid":  # trouver l'intrus dans une grille
         rows, cols = r["rows"], r["cols"]
-        cell = 150
-        gx0 = 540 - cols * cell / 2; gy0 = 800 - rows * cell / 2 + 130
+        cell = r.get('cell', 150)
+        gx0 = 540 - cols * cell / 2; gy0 = r.get('gy', 500)
         for i in range(rows):
             for j in range(cols):
                 a = clamp((t - 0.2 - (i + j) * 0.03) * 4)
                 ch = r["odd"] if (i, j) == tuple(r["pos"]) else r["base"]
-                put(img, ch, gx0 + j * cell + cell / 2, gy0 + i * cell + cell / 2, 118 * a)
+                put(img, ch, gx0 + j * cell + cell / 2, gy0 + i * cell + cell / 2, cell * 0.79 * a)
         if rev:
             ci, cj = r["pos"]
             cx, cy = gx0 + cj * cell + cell / 2, gy0 + ci * cell + cell / 2
-            rad = 120 - 40 * ease(rev)
+            rad = cell * 0.8 - cell * 0.27 * ease(rev)
             d.ellipse((cx - rad, cy - rad, cx + rad, cy + rad), outline=GRN, width=12)
     elif k == "odd":  # 4 cartes, 1 intrus
         cw = 440
@@ -154,12 +177,22 @@ def draw_round(img, d, r, t):
             text(d, (540, 1500), r["answer_text"], 64 if len(r["answer_text"]) < 18 else 52, WHT, stroke=2)
 
 
+CTAS = [('💬', 'Comment your answer: A, B, C or D'), ('🤝', 'Share with a smart friend'), ('🔔', 'Subscribe for a new quiz every day')]
+
+
+def cfg(spec):
+    global INTRO, RDUR
+    INTRO = spec.get('intro', 2.2); RDUR = INTRO + THINK + REVEAL
+
+
 def timeline(spec):
+    cfg(spec)
     n = len(spec["rounds"])
     return HOOK, n, HOOK + n * RDUR + OUTRO
 
 
 def frame(spec, t):
+    cfg(spec)
     img = bg(); d = ImageDraw.Draw(img)
     hk, n, total = timeline(spec)
     brand = spec.get("brand", "QUICK QUIZ")
@@ -172,20 +205,37 @@ def frame(spec, t):
         text(d, (540, 1500), "Ready? Let's go!", 60, CYA)
     elif t < hk + n * RDUR:
         ri = int((t - hk) // RDUR)
-        header(img, d, ri, n, brand)
-        draw_round(img, d, spec["rounds"][ri], t - hk - ri * RDUR)
+        r = spec["rounds"][ri]
+        header(img, d, ri, n, brand, r.get("level"))
+        draw_round(img, d, r, t - hk - ri * RDUR)
+        tr = t - hk - ri * RDUR
+        if INTRO + 0.5 < tr < INTRO + THINK:
+            ce, ct_ = CTAS[ri % 3]
+            pill(d, (90, 1262, 990, 1330), (255, 255, 255), 34)
+            put(img, ce, 160, 1296, 46)
+            text(d, (590, 1296), ct_, 33, (50, 25, 80))
     else:
         u = t - hk - n * RDUR
         header(img, d, n, n, brand)
-        s = back(u * 2.5)
-        text(d, (540, 520), "Your score?", int(120 * clamp(s, 0.2, 1.1)), YEL, stroke=4)
+        text(d, (540, 330), "Your score?", int(110 * clamp(back(u * 2.5), 0.2, 1.1)), YEL, stroke=4)
         for i, (lab, e) in enumerate(spec["scores"]):
-            y = 720 + i * 190
-            pill(d, (110, y - 70, 970, y + 70), (60, 50, 120), 50)
-            put(img, e, 220, y, 100)
-            text(d, (560, y), lab, 54, WHT)
-        text(d, (540, 1450), "Comment your score 👇".replace("👇", ""), 56, CYA)
-        text(d, (540, 1530), "Follow for a new quiz!", 52, WHT)
+            y = 500 + i * 135
+            pill(d, (110, y - 52, 970, y + 52), (60, 50, 120), 40)
+            put(img, e, 200, y, 76)
+            text(d, (570, y), lab, 44, WHT)
+        cards = [("👍", "LIKE if you got 3/3", (70, 160, 255)), ("💬", "COMMENT your score", (80, 200, 120)),
+                 ("🤝", "SHARE with a friend", (255, 160, 40)), ("🔔", "SUBSCRIBE", (255, 60, 80))]
+        for i, (e, lab, col) in enumerate(cards):
+            a = clamp(back((u - 1.0 - i * 0.55) * 3), 0.0, 1.1)
+            if a <= 0.02: continue
+            x0 = 60 + (i % 2) * 500; y0 = 960 + (i // 2) * 300
+            cx, cy = x0 + 230, y0 + 120
+            pul = 1 + (0.05 * math.sin(u * 9) if i == 3 else 0)
+            w2, h2 = 230 * a * pul, 120 * a * pul
+            pill(d, (cx - w2, cy - h2, cx + w2, cy + h2), col, 50)
+            if a > 0.7:
+                put(img, e, cx, cy - 40, 96)
+                text(d, (cx, cy + 62), lab, 36 if len(lab) > 16 else 42, WHT, stroke=2)
     return img
 
 
@@ -211,7 +261,11 @@ def say(buf, t0, text):
     i = int(t0 * sfx.SR); buf[i:i + len(v)] += v[: len(buf) - i] * 1.6
 
 
+LEAD = {'EASY': 'Easy!', 'MEDIUM': 'Medium!', 'HARD': 'Hard one!'}
+
+
 def audio(spec, out):
+    cfg(spec)
     hk, n, total = timeline(spec)
     ev = [(0.1, "pop", 0.9)]
     for ri in range(n):
@@ -222,13 +276,15 @@ def audio(spec, out):
         ev.append((t0 + INTRO + THINK, "ding", 0.9))
         ev.append((t0 + INTRO + THINK + 0.05, "sparkle", 0.6))
     ev.append((hk + n * RDUR, "whoosh", 0.6)); ev.append((hk + n * RDUR + 0.3, "clap", 0.6))
+    for i in range(4): ev.append((hk + n * RDUR + 1.0 + i * 0.55, "pop", 0.7))
     a = sfx.mix(ev, total)[: int(total * sfx.SR)] * 0.5
     say(a, 0.15, spec["hook"][0].title() + "! " + spec["hook"][1])
     for ri, r in enumerate(spec["rounds"]):
         t0 = hk + ri * RDUR
-        say(a, t0 + 0.1, r["q"])
-        say(a, t0 + INTRO + THINK + 0.35, "It's " + r["answer_text"].split(" (")[0] + "!")
-    say(a, hk + n * RDUR + 0.3, "How many did you get? Comment your score, and follow for more!")
+        say(a, t0 + 0.1, LEAD.get(r.get("level"), "") + " " + r["q"])
+        ans = r["answer_text"].split(" (")[0]
+        say(a, t0 + INTRO + THINK + 0.3, ("The answer is " + ans + "!") if ans.replace(".", "").isdigit() else ("It's " + ans + "!"))
+    say(a, hk + n * RDUR + 0.3, "Like if you got three out of three! Comment your score, share it with a friend, and subscribe for a new quiz every day!")
     a = a / max(1e-6, np.abs(a).max()) * 0.9
     sfx.write_wav(out, a.astype(np.float32))
 
