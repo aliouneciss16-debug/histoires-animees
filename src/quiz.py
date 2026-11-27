@@ -71,11 +71,13 @@ def header(img, d, ri, nr, brand, level=None):
     pill(d, (40, 60, 40 + 400, 140), YEL, 40)
     text(d, (240, 100), brand, 40, (50, 25, 80))
     if level:
-        pill(d, (470, 70, 470 + 250, 130), LV[level], 30)
-        text(d, (595, 100), level, 38, WHT, stroke=2)
+        bw = 250 if nr <= 3 else 190
+        pill(d, (470, 70, 470 + bw, 130), LV[level], 30)
+        text(d, (470 + bw // 2, 100), level, 38 if nr <= 3 else 34, WHT, stroke=2)
     if ri is not None:
         for i in range(nr):
-            x = 1040 - (nr - i) * 70 + 35
+            st = 70 if nr <= 3 else 62
+            x = 1040 - (nr - i) * st + st // 2
             d.ellipse((x - 22, 78, x + 22, 122), fill=(GRN if i < ri else (YEL if i == ri else (90, 80, 150))))
 
 
